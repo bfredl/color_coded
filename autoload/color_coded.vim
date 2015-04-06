@@ -4,7 +4,7 @@
 " Setup
 " ------------------------------------------------------------------------------
 
-let s:color_coded_api_version = 0x97e07fc
+let s:color_coded_api_version = 0x788831d
 let s:color_coded_valid = 1
 let s:color_coded_unique_counter = 1
 let g:color_coded_matches = {}
@@ -211,3 +211,11 @@ endfunction!
 function! color_coded#clear_all_matches()
   let g:color_coded_matches = {}
 endfunction!
+
+function! color_coded#nvim_update()
+  if index(g:color_coded_filetypes, &ft) < 0 || g:color_coded_enabled == 0
+    return
+  endif
+  call CCHighlight()
+endfunction!
+

@@ -2,6 +2,20 @@
 " Maintainer:	Jeaye <contact@jeaye.com>
 
 " ------------------------------------------------------------------------------
+if has('nvim')
+  "testing: of by default
+  if !exists("g:color_coded_enabled")
+    let g:color_coded_enabled = 0
+  endif
+  if !exists("g:color_coded_filetypes")
+    let g:color_coded_filetypes = ['c', 'h', 'cpp', 'hpp', 'cc', 'm', 'mm']
+  endif
+  augroup color_coded
+      au BufEnter,TextChanged,TextChangedI * call color_coded#nvim_update()
+  augroup END
+  finish
+endif
+
 if v:version < 704 || !exists("*matchaddpos")
   echohl WarningMsg |
         \ echomsg "color_coded unavailable: requires Vim 7.4p330+" |

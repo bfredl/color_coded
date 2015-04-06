@@ -168,17 +168,18 @@ PROJECT = %PROJECT%
 OUT_DIR = bin/
 OBJ_DIR = ${OUT_DIR}obj/
 TARGET = ${OUT_DIR}color_coded.so
+TARGET2 = ${OUT_DIR}color_coded_nvim.so
 BOOST_SYSTEM = ${OUT_DIR}libcolor_coded_boost_system.a
 BOOST_FILESYSTEM = ${OUT_DIR}libcolor_coded_boost_filesystem.a
 
-OBJS := $(patsubst %.cpp,%.cpp.o,$(wildcard src/*.cpp))
+OBJS := $(patsubst %.cpp,%.cpp.o,$(wildcard src/main.cpp))
 OBJS := $(filter-out ${EXCLUDE},${OBJS})
 SRCS := ${OBJS:.cpp.o=.cpp}
 OUT_OBJS := $(foreach obj,${OBJS}, ${OBJ_DIR}${obj})
 
 log = echo "$(1)" 1>&2
 
-all: ${TARGET}
+all: ${TARGET} ${TARGET2}
 
 ${TARGET}_setup: setup ${BOOST_SYSTEM} ${BOOST_FILESYSTEM}
 	$(call log,"Building ${TARGET}")
@@ -186,6 +187,12 @@ ${TARGET}_setup: setup ${BOOST_SYSTEM} ${BOOST_FILESYSTEM}
 ${TARGET}: ${TARGET}_setup ${OBJS}
 	$(call log,"Linking $@")
 	${CXX} -shared -o $@ ${CXX_FLAGS} ${OUT_OBJS} ${LD_LIBS} \
+          -Llib/boost/system/bin -Llib/boost/filesystem/bin \
+	  -lcolor_coded_boost_system -lcolor_coded_boost_filesystem
+
+${TARGET2}: ${TARGET}_setup 
+	$(call log,"Linking $@")
+	${CXX} -shared -o $@ ${CXX_FLAGS} src/main_nvim.cpp ${LD_LIBS} \
           -Llib/boost/system/bin -Llib/boost/filesystem/bin \
 	  -lcolor_coded_boost_system -lcolor_coded_boost_filesystem
 
