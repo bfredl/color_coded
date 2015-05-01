@@ -30,8 +30,7 @@ class CCPlugin(object):
     def __init__(self, vim):
         self.vim = vim
         self.cb = ffi.callback("color_coded_callback_T", self._cb)
-        self.reqdata = {}
-        self.nreq = 0
+        self.buf = {}
         self.cur_hl = {}
 
     def next_hlid(self, *args):
@@ -54,7 +53,7 @@ class CCPlugin(object):
         self.vim.session.threadsafe_call(self.on_highlight, buf, items)
 
     def on_highlight(self, data, items):
-        buf = self.reqdata.pop(data)
+        buf = self.buf[data]
         if not items:
             return
         #buf = neovim.api.Buffer(self.vim.session, buf)
@@ -70,8 +69,8 @@ class CCPlugin(object):
     def request_highlight(self, args):
         buf = self.vim.current.buffer
         name = buf.name
+        bufid = buf.number
+        self.buf[bufid] = buf
         data = '\n'.join(buf[:])
-        self.reqdata[self.nreq] = buf
-        api.color_coded_request(self.cb, self.nreq, name, data)
-        self.nreq = self.nreq+1
+        api.color_coded_request(self.cb, bufid, name, data)
 
